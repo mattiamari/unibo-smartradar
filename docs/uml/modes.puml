@@ -1,0 +1,22 @@
+@startuml modes
+
+class Radar {
+    + getCurrentMode() : RadarMode
+    + manualMode()
+    + autoMode()
+    + singleMode()
+}
+
+interface RadarMode {
+    entry()
+    exit()
+    getName() : string
+}
+
+Radar -> RadarMode
+
+RadarMode <|-- ManualMode
+RadarMode <|-- AutoMode
+RadarMode <|-- SingleMode
+
+@enduml

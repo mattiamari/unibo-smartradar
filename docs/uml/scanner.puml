@@ -1,0 +1,44 @@
+@startuml scanner
+
+interface Task
+
+class Scanner {
+    + Scanner(Servo, Sonar, Led)
+    + setScanStatus(ScanStatus)
+}
+
+class LoopScanner {
+    + isComplete()
+}
+
+class ScanStatus {
+    + isAlarmActive()
+    + updateMeasure(Measure)
+    + getMeasures() : Measure[]
+    + clearMeasures()
+}
+
+class Measure {
+    + getSliceIdx()
+    + getAngle()
+    + getDistance()
+}
+
+class SerialUpdater {
+    + SerialUpdater(Serial)
+    + setScanStatus()
+}
+
+interface Serial {
+    println(msg : string)
+}
+
+Task <|-- Scanner
+Scanner <|-- LoopScanner
+ScanStatus o-- Measure
+Scanner o-- ScanStatus
+
+Task <|-- SerialUpdater
+Serial <- SerialUpdater : uses
+
+@enduml

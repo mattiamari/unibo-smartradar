@@ -1,0 +1,23 @@
+@startuml scanner
+
+state Scan {
+    [*] --> Measure : ANGLE = 0
+
+    state ObjectDetected <<choice>>
+    state CurrentAngle <<choice>>
+
+    Measure --> ObjectDetected
+
+    ObjectDetected --> LedBlink : [object detected]
+    LedBlink --> MotorMovement
+
+    ObjectDetected --> MotorMovement : [else]
+
+    MotorMovement --> CurrentAngle
+    CurrentAngle --> Measure : [0 <= ANGLE < 180]
+    CurrentAngle --> [*] : [else]
+
+    MotorMovement: do / ANGLE += N
+}
+
+@enduml

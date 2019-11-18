@@ -1,0 +1,50 @@
+﻿S : sonar
+M : servo
+P : pir
+Ld, La : led rossi
+Tm1, Tm2, Tm3 : bottoni
+Pot : potenziometro
+Dnear, Dfar : distanza min/max di allarme
+N : step per servo
+
+collegamento seriale a pc
+
+selezione modalità via seriale e bottoni
+- Tm1: single
+- Tm2: manual
+- Tm3: auto
+
+modalità default: manual
+
+## Parametri test
+N = 16
+Dnear = 0.2 m
+Dfar = 0.4 m
+Tmin = 2s
+Tmax = 10s
+
+## 3 modalità
+### single
+1. attesa movimento [Pir]
+2. [scansione] con risultati su console
+- risparmio energetico
+
+### manual
+- movimento tramite seriale
+- invio rilevamento e posizione tramite seriale
+
+### auto
+- [scansioni] continue
+- aggiornamento rilevazioni via seriale
+- se oggetto rilevato tra [Dnear] e [Dfar]: [stato allarme]
+- se in allarme e oggetto non rilevato: esci dallo [stato allarme]
+
+## Scansione
+- 180 gradi divisi in [N] porzioni
+- rilevamento distanza su ogni porzione
+- tempo impegato regolabile tra [Tmin] e [Tmax] tramite seriale o [Pot]
+- [Ld] lampeggia se oggetto rilevato
+
+## Stato Allarme
+- notifica via seriale
+- lampeggio continuo led [La]

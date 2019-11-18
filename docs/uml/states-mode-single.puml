@@ -1,0 +1,16 @@
+@startuml mode-single
+
+[*] --> SingleMode
+
+state SingleMode {
+    !include states-scan.puml
+    
+    [*] --> Waiting
+
+    Waiting --> Scan : movement\n detected
+    Scan --> Waiting
+}
+
+SingleMode --> [*] : mode change
+
+@enduml

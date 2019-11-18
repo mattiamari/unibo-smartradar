@@ -1,0 +1,44 @@
+@startuml classes
+
+interface Sonar {
+    getReading() : double
+}
+
+interface Servo {
+    setAngle(angle : integer)
+    getAngle()
+}
+
+interface Pir {
+    isDetecting() : boolean
+}
+
+interface Led {
+    isOn()
+    turnOn()
+    turnOff()
+    toggle()
+}
+
+interface Button {
+    isPressed() : boolean
+}
+
+interface Potentiometer {
+    getReading() : integer
+}
+
+interface EventEmitter {
+    addEventHandler(EventHandler)
+}
+
+interface EventHandler {
+    handle()
+}
+
+EventEmitter <.. Pir
+EventEmitter <.. Button
+
+EventEmitter - EventHandler
+
+@enduml

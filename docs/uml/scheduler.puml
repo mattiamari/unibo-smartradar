@@ -1,0 +1,17 @@
+@startuml scheduler
+
+interface Scheduler {
+    add(task : Task, interval : integer)
+    remove(task : Task)
+    clear()
+    schedule()
+}
+
+interface Task {
+    step()
+    isComplete()
+}
+
+Scheduler o-- Task
+
+@enduml

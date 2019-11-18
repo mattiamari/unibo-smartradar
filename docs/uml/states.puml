@@ -1,0 +1,19 @@
+@startuml radar-states
+
+[*] --> Running
+
+state Running {
+    [*] --> ManualMode
+
+    state Button <<choice>>
+
+    ManualMode --> Button : button pressed
+    Button ---> AutoMode
+    Button ---> SingleMode
+    Button ---> ManualMode
+
+    AutoMode --> Button : button pressed
+    SingleMode --> Button : button pressed
+}
+
+@enduml

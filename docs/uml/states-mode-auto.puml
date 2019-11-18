@@ -1,0 +1,18 @@
+@startuml mode-auto
+
+[*] --> AutoMode
+
+state AutoMode {
+    !include states-scan.puml
+
+    Scan -u-> Scan
+
+    --
+
+    NoAlarm --> Alarm : object detected
+    Alarm --> NoAlarm
+}
+
+AutoMode --> [*] : mode change
+
+@enduml

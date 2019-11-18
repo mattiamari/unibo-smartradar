@@ -1,0 +1,18 @@
+@startuml mode-manual
+
+[*] --> ManualMode
+
+state ManualMode {
+    [*] --> Measure
+
+    Measure : do / make measurement
+    MotorMovement : do / change servo angle
+
+    Measure --> MotorMovement : change position\n message received
+    MotorMovement --> Measure
+    Measure -u-> Measure : every X ms   
+}
+
+ManualMode --> [*] : mode change
+
+@enduml

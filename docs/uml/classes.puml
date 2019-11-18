@@ -1,0 +1,10 @@
+@startuml classes
+
+Radar "1" *-- "1" Sonar
+Radar "1" *-- "1" Pir
+Radar "1" *-- "1" Servo
+Radar "1" *-- "2" Led
+Radar "1" *-- "3" Button
+Radar "1" *-- "1" Potentiometer
+
+@enduml
