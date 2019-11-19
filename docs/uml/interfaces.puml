@@ -21,7 +21,6 @@ interface Led {
 }
 
 interface Button {
-    isPressed() : boolean
 }
 
 interface Potentiometer {
