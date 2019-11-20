@@ -10,12 +10,18 @@ class DummyTask : public Task
 {
 public:
     unsigned int steps = 0;
+    bool complete;
+
+    DummyTask() {
+        complete = false;
+    }
+
     void step() {
         steps++;
     }
 
     bool isComplete() {
-        return false;
+        return complete;
     }
 };
 
@@ -112,6 +118,30 @@ void test_can_schedule_multiple_tasks(void) {
     TEST_ASSERT_EQUAL(64, task4.steps);
 }
 
+void test_completed_tasks_are_removed(void) {
+    Scheduler sched = Scheduler();
+    DummyTask task1 = DummyTask();
+    
+    sched.add((Task*)&task1, 1);
+
+    TEST_ASSERT_EQUAL(1, sched.getTaskCount());
+    
+    for (int i = 0; i < 2; i++) {
+        sched.schedule();
+    }
+
+    TEST_ASSERT_EQUAL(1, task1.steps);
+
+    task1.complete = true;
+
+    for (int i = 0; i < 2; i++) {
+        sched.schedule();
+    }
+
+    TEST_ASSERT_EQUAL(1, task1.steps);
+    TEST_ASSERT_EQUAL(0, sched.getTaskCount());
+}
+
 void execute_scheduler() {
     UNITY_BEGIN();
 
@@ -122,6 +152,7 @@ void execute_scheduler() {
     RUN_TEST(test_can_clear_all_tasks);
     RUN_TEST(test_can_schedule_one_task);
     RUN_TEST(test_can_schedule_multiple_tasks);
+    RUN_TEST(test_completed_tasks_are_removed);
 
     UNITY_END();
 }

@@ -45,6 +45,12 @@ void Scheduler::schedule() {
             continue;
         }
         
+        if (iter->task->isComplete()) {
+            remove(iter->task);
+            iter++;
+            continue;
+        }
+
         if (iter->elapsed < iter->interval) {
             iter->elapsed++;
             iter++;
