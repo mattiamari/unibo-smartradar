@@ -18,9 +18,10 @@ namespace smartradar
         void setScanStatus(ScanStatus *status);
         void setScanTime(unsigned int milliseconds);
         void step();
+        bool hasDetected();
         bool isComplete();
 
-    private:
+    protected:
         Servo *servo;
         Sonar *sonar;
         Led *led;
@@ -30,13 +31,15 @@ namespace smartradar
         int currentAngle;
         short currentState;
         bool scanComplete;
+        bool detected;
 
+        void reset();
         void stateServoMovement();
         void stateMeasure();
         void stateLedOn();
         void stateLedOff();
         void stateWaitNext();
-        unsigned int getNearestSliceBound();
+        unsigned int getNearestBoundIndex();
 
         enum ScannerStates {
             STATE_MEASURE = 1,

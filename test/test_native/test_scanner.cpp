@@ -124,7 +124,7 @@ void test_scan_should_take_specified_scantime() {
     unsigned int scanTime = 2000;
     sc.setScanTime(scanTime);
 
-    // when sonar is not detecting, Scanner states reduce to
+    // When sonar is not detecting, Scanner end up being
     // ServoMovement -> Measure -> WaitNext
     // so it should take SCAN_SLICES * 3
     // plus some wait time after each measure amounting to scanTime / TICK_INTERVAL_MS
@@ -145,6 +145,25 @@ void test_scan_should_take_specified_scantime() {
     TEST_ASSERT_TRUE(sc.isComplete());
 }
 
+void test_detected_should_be_true_on_detect() {
+    Scanner sc = Scanner(&servo, &sonar, &led);
+    sc.setScanStatus(&status);
+    servo.setAngle(0);
+    sonar.reading = 1.0;
+
+    // Should run through
+    // ServoMovement -> Measure -> LedOn -> LedOff -> WaitNext
+    unsigned int ticks = 5;
+
+    TEST_ASSERT_FALSE(sc.hasDetected());
+
+    for (int i = 0; i < ticks; i++) {
+        sc.step();
+    }
+
+    TEST_ASSERT_TRUE(sc.hasDetected());
+}
+
 void execute_scanner() {
     UNITY_BEGIN();
 
@@ -155,6 +174,7 @@ void execute_scanner() {
     RUN_TEST(test_should_blink_led_on_detect);
     RUN_TEST(test_should_not_blink_led_when_not_detecting);
     RUN_TEST(test_scan_should_take_specified_scantime);
+    RUN_TEST(test_detected_should_be_true_on_detect);
 
     UNITY_END();
 }

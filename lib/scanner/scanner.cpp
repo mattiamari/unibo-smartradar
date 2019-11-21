@@ -15,9 +15,15 @@ Scanner::Scanner(Servo *servo, Sonar *sonar, Led *led) {
     this->led = led;
     scanStatus = nullptr;
     scanTime = 0;
+    
+    reset();
+}
+
+void Scanner::reset() {
     currentState = STATE_SERVO_MOVEMENT;
     scanComplete = false;
-    currentSlice = getNearestSliceBound();
+    currentSlice = getNearestBoundIndex();
+    detected = false;
 }
 
 void Scanner::setScanStatus(ScanStatus *status) {
@@ -42,11 +48,15 @@ void Scanner::step() {
     }
 }
 
+bool Scanner::hasDetected() {
+    return detected;
+}
+
 bool Scanner::isComplete() {
     return scanComplete;
 }
 
-unsigned int Scanner::getNearestSliceBound() {
+unsigned int Scanner::getNearestBoundIndex() {
     int min = servo->getAngleMin();
     int max = servo->getAngleMax();
 
@@ -71,6 +81,8 @@ void Scanner::stateMeasure() {
     scanStatus->getMeasures()[currentSlice].distance = distance;
 
     if (distance >= sonar->getDistanceMin() && distance <= sonar->getDistanceMax()) {
+        scanStatus->setAlarm(true);
+        detected = true;
         currentState = STATE_LED_ON;
         return;
     }
