@@ -11,6 +11,8 @@ public:
 
     DummySonar();
     float getReading();
+    float getDistanceMin();
+    float getDistanceMax();
 };
 
 class DummyServo : public Servo

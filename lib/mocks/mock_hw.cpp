@@ -11,6 +11,15 @@ float DummySonar::getReading() {
     return reading;
 }
 
+float DummySonar::getDistanceMin() {
+    return 0.5;
+}
+
+float DummySonar::getDistanceMax() {
+    return 2.0;
+}
+
+
 // Servo
 DummyServo::DummyServo() {
     angle = 0;

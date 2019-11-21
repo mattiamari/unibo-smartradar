@@ -9,6 +9,8 @@ namespace smartradar
         Sonar() {};
         ~Sonar() {};
         virtual float getReading() = 0;
+        virtual float getDistanceMin() = 0;
+        virtual float getDistanceMax() = 0;
     };
 }
 
