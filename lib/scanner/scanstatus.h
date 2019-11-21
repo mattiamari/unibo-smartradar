@@ -1,6 +1,8 @@
 #ifndef SMARTRADAR_SCANSTATUS_H
 #define SMARTRADAR_SCANSTATUS_H
 
+#define SCAN_SLICES 16
+
 namespace smartradar
 {
     typedef struct Measure_s {
@@ -18,6 +20,10 @@ namespace smartradar
         void updateMeasure(Measure *measure);
         Measure *getMeasures();
         void clearMeasures();
+        void setAlarm(bool state);
+    private:
+        Measure measures[SCAN_SLICES];
+        bool alarm;
     };
 }
 
