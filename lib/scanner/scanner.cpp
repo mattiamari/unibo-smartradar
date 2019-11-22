@@ -1,12 +1,10 @@
 #include "scanner.h"
 #include "scheduler.h"
 
-#define BLINK_DELAY 40 / TICK_INTERVAL_MS
-
 using namespace smartradar;
 
-int smartradar::sliceToAngle(int slice, int min, int max) {
-    return (slice / SCAN_SLICES * (max - min)) + min;
+int smartradar::sliceToAngle(int slice, int slicesCount, int min, int max) {
+    return ((float)slice / slicesCount * (max - min)) + min + ((max - min) / slicesCount / 2);
 }
 
 Scanner::Scanner(Servo *servo, Sonar *sonar, Led *led) {
@@ -23,7 +21,13 @@ void Scanner::reset() {
     currentState = STATE_SERVO_MOVEMENT;
     scanComplete = false;
     currentSlice = getNearestBoundIndex();
+    direction = 1;
     detected = false;
+
+    // If starting from the right bound we should move backwards
+    if (currentSlice == SCAN_SLICES - 1) {
+        direction = -1;
+    }
 }
 
 void Scanner::setScanStatus(ScanStatus *status) {
@@ -64,13 +68,14 @@ unsigned int Scanner::getNearestBoundIndex() {
 }
 
 void Scanner::stateServoMovement() {
-    if (currentSlice >= SCAN_SLICES) {
+    if (currentSlice < 0 || currentSlice >= SCAN_SLICES) {
         scanComplete = true;
         return;
     }
 
-    currentAngle = sliceToAngle(currentSlice, servo->getAngleMin(), servo->getAngleMax());
+    currentAngle = sliceToAngle(currentSlice, SCAN_SLICES, servo->getAngleMin(), servo->getAngleMax());
     servo->setAngle(currentAngle);
+    scanStatus->setCurrentSlice(currentSlice);
     currentState = STATE_MEASURE;
 }
 
@@ -97,7 +102,7 @@ void Scanner::stateLedOn() {
 
 void Scanner::stateLedOff() {
     static unsigned int elapsed = 0;
-    TASK_WAIT(elapsed, BLINK_DELAY)
+    TASK_WAIT(elapsed, BLINK_DELAY_TICKS)
 
     led->turnOff();
     currentState = STATE_WAIT_NEXT;
@@ -108,5 +113,5 @@ void Scanner::stateWaitNext() {
     TASK_WAIT(elapsed, scanTime / TICK_INTERVAL_MS / SCAN_SLICES)
 
     currentState = STATE_SERVO_MOVEMENT;
-    currentSlice += 1;
+    currentSlice += direction;
 }

@@ -7,9 +7,11 @@
 #include "led.h"
 #include "scanstatus.h"
 
+#define BLINK_DELAY_TICKS 40 / TICK_INTERVAL_MS
+
 namespace smartradar
 {
-    int sliceToAngle(int slice, int min, int max);
+    int sliceToAngle(int slice, int sliceCount, int min, int max);
 
     class Scanner : public Task
     {   
@@ -27,9 +29,10 @@ namespace smartradar
         Led *led;
         ScanStatus *scanStatus;
         unsigned int scanTime;
-        unsigned int currentSlice;
+        int currentSlice;
         int currentAngle;
         short currentState;
+        short direction;
         bool scanComplete;
         bool detected;
 
