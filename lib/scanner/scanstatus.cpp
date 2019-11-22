@@ -36,3 +36,19 @@ void ScanStatus::clearMeasures() {
 void ScanStatus::setAlarm(bool state) {
     alarm = state;
 }
+
+int ScanStatus::getCurrentSlice() {
+    return currentSlice;
+}
+
+void ScanStatus::setCurrentSlice(int slice) {
+    currentSlice = slice;
+}
+
+int ScanStatus::getCurrentMode() {
+    return currentMode;
+}
+
+void ScanStatus::setCurrentMode(RadarMode mode) {
+    currentMode = mode;
+}
