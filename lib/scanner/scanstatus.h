@@ -10,7 +10,7 @@ namespace smartradar
     typedef struct Measure_s {
         unsigned int sliceIdx;
         int angle;
-        float distance;
+        double distance;
     } Measure;
 
     class ScanStatus
@@ -25,12 +25,15 @@ namespace smartradar
         void setAlarm(bool state);
         int getCurrentSlice();
         void setCurrentSlice(int slice);
-        int getCurrentMode();
+        int getScanDuration();
+        void setScanDuration(int duration);
+        RadarMode getCurrentMode();
         void setCurrentMode(RadarMode mode);
     private:
         Measure measures[SCAN_SLICES];
         bool alarm;
         int currentSlice;
+        int scanDuration;
         RadarMode currentMode;
     };
 }

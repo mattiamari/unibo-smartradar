@@ -45,7 +45,16 @@ void ScanStatus::setCurrentSlice(int slice) {
     currentSlice = slice;
 }
 
-int ScanStatus::getCurrentMode() {
+int ScanStatus::getScanDuration() {
+    return scanDuration;
+}
+
+void ScanStatus::setScanDuration(int duration) {
+    scanDuration = duration;
+}
+
+
+RadarMode ScanStatus::getCurrentMode() {
     return currentMode;
 }
 
