@@ -4,6 +4,7 @@
 #include "radarmode.h"
 #include "scanstatus.h"
 #include "scheduler.h"
+#include "serialupdater.h"
 
 #include "sonar.h"
 #include "pir.h"
@@ -22,11 +23,13 @@ namespace smartradar
         void setModeAuto();
         void pirTriggered();
         void tick();
+        RadarMode getCurrentMode();
 
     private:
         RadarMode currentMode;
         ScanStatus scanStatus;
         Scheduler scheduler;
+        SerialUpdater serialUpdater;
 
         Sonar *sonar;
         Pir *pir;

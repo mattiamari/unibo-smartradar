@@ -1,6 +1,5 @@
 #include "radar.h"
 
-#include "serialupdater.h"
 #include "scanner.h"
 #include "loopscanner.h"
 
@@ -16,6 +15,8 @@ Radar::Radar(Serial *serial, Sonar *sonar, Pir *pir, Servo *servo, Led *led1, Le
 
     currentMode = MODE_NONE;
     scheduler = Scheduler();
+    scanStatus = ScanStatus();
+    serialUpdater = SerialUpdater(serial, &scanStatus);
 }
 
 void Radar::setModeManual() {
@@ -23,9 +24,6 @@ void Radar::setModeManual() {
         return;
     }
     currentMode = MODE_MANUAL;
-
-    scanStatus = ScanStatus();
-    SerialUpdater serialUpdater = SerialUpdater(serial, &scanStatus);
 
     scheduler.add(&serialUpdater, 500 / TICK_INTERVAL_MS);
 }
@@ -35,6 +33,8 @@ void Radar::setModeSingle() {
         return;
     }
     currentMode = MODE_SINGLE;
+
+    scheduler.clear();
 }
 
 void Radar::setModeAuto() {
@@ -42,13 +42,26 @@ void Radar::setModeAuto() {
         return;
     }
     currentMode = MODE_AUTO;
+
+    LoopScanner loopScanner = LoopScanner(servo, sonar, led1);
+
+    scheduler.add(&loopScanner, 0);
+    scheduler.add(&serialUpdater, 500 / TICK_INTERVAL_MS);
 }
 
 void Radar::pirTriggered() {
+    if (currentMode != MODE_SINGLE) {
+        return;
+    }
+
     Scanner scanner = Scanner(servo, sonar, led1);
     scheduler.add(&scanner, 0);
 }
 
 void Radar::tick() {
     scheduler.schedule();
+}
+
+RadarMode Radar::getCurrentMode() {
+    return currentMode;
 }

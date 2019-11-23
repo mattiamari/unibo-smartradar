@@ -1,4 +1,7 @@
 #include "serialupdater.h"
+#include <radarmode.h>
+
+#include <string.h>
 
 using namespace smartradar;
 
@@ -8,19 +11,28 @@ SerialUpdater::SerialUpdater(Serial *serial, ScanStatus *scanStatus) {
 }
 
 void SerialUpdater::step() {
-    char buf[150];
+    char buf[256];
+    char modeString[8];
+
+    switch (scanStatus->getCurrentMode()) {
+        case MODE_MANUAL: strcpy(modeString, "manual"); break;
+        case MODE_SINGLE: strcpy(modeString, "single"); break;
+        case MODE_AUTO: strcpy(modeString, "auto"); break;
+        default: strcpy(modeString, "none");
+    }
 
     sprintf(buf,
         "{"
-            "\"mode\": \"%s\","
-            "\"alarm\": %d,"
-            "\"slices\": %d,"
-            "\"scanDuration\": %d,"
-            "\"currentSlice\": %d,"
-            "\"measures\": [",
-        scanStatus->getCurrentMode(),
+            "\"mode\":\"%s\","
+            "\"alarm\":%d,"
+            "\"slices\":%d,"
+            "\"scanDuration\":%d,"
+            "\"currentSlice\":%d,"
+            "\"measures\":[",
+        modeString,
         scanStatus->isAlarmActive(),
         SCAN_SLICES,
+        scanStatus->getScanDuration(),
         scanStatus->getCurrentSlice()
     );
     serial->print(buf);
@@ -29,7 +41,7 @@ void SerialUpdater::step() {
 
     for (int i = 0; i < SCAN_SLICES; i++) {
         sprintf(buf,
-            "{\"id\": %d, \"angle\": %d, \"distance\": %f}",
+            "{\"i\":%d,\"a\":%d,\"d\":%.4f}",
             m[i].sliceIdx, m[i].angle, m[i].distance);
         serial->print(buf);
 
@@ -39,8 +51,7 @@ void SerialUpdater::step() {
         }
     }
 
-    serial->println("] }");
-
+    serial->print("]}\n");
 }
 
 bool SerialUpdater::isComplete() {
