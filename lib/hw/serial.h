@@ -9,8 +9,8 @@ namespace smartradar
     public:
         Serial() {};
         ~Serial() {};
-        virtual void print(char *text) = 0;
-        virtual void println(char *text) = 0;
+        virtual void print(const char *text) = 0;
+        virtual void println(const char *text) = 0;
     };
 }
 

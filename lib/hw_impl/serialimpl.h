@@ -10,8 +10,8 @@ namespace smartradar
     class SerialImpl : public Serial {
     public:
         SerialImpl() {};
-        void println(char *msg);
-        void print(char *msg);
+        void println(const char *msg);
+        void print(const char *msg);
     };
 }
 
