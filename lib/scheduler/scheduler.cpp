@@ -34,6 +34,10 @@ void Scheduler::remove(Task *task) {
     }
 }
 
+void Scheduler::has(Task *task) {
+    
+}
+
 void Scheduler::clear() {
     TaskInfo *iter = tasks;
     TaskInfo *endptr = tasks + MAX_TASKS;

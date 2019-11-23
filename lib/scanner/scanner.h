@@ -6,8 +6,9 @@
 #include "sonar.h"
 #include "led.h"
 #include "scanstatus.h"
+#include "scheduler.h"
 
-#define BLINK_DELAY_TICKS 40 / TICK_INTERVAL_MS
+#define BLINK_DELAY_TICKS 50 / TICK_INTERVAL_MS
 
 namespace smartradar
 {
@@ -45,10 +46,10 @@ namespace smartradar
         unsigned int getNearestBoundIndex();
 
         enum ScannerStates {
-            STATE_MEASURE = 1,
+            STATE_SERVO_MOVEMENT = 1,
+            STATE_MEASURE,
             STATE_LED_ON,
             STATE_LED_OFF,
-            STATE_SERVO_MOVEMENT,
             STATE_WAIT_NEXT
         };
     };

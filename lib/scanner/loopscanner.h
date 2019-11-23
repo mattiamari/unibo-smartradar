@@ -11,6 +11,7 @@ namespace smartradar
         LoopScanner(Servo *servo, Sonar *sonar, Led *led)
             : Scanner(servo, sonar, led) {};
         void step();
+        bool isComplete();
     };
 }
 

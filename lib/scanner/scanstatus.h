@@ -1,9 +1,9 @@
 #ifndef SMARTRADAR_SCANSTATUS_H
 #define SMARTRADAR_SCANSTATUS_H
 
-#define SCAN_SLICES 16
+#include "radarmode.h"
 
-#include "radar.h"
+#define SCAN_SLICES 16
 
 namespace smartradar
 {

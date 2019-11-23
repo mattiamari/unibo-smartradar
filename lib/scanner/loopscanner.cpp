@@ -13,3 +13,7 @@ void LoopScanner::step() {
 
     Scanner::step();
 }
+
+bool LoopScanner::isComplete() {
+    return false;
+}
