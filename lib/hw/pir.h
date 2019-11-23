@@ -8,7 +8,6 @@ namespace smartradar
     public:
         Pir() {};
         ~Pir() {};
-        virtual bool isDetecting();
     };
 }
 
