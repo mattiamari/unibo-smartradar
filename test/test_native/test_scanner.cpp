@@ -84,10 +84,10 @@ void test_should_update_measures_when_in_range() {
     servo.setAngle(0);
     sonar.reading = 1.0;
 
-    // it could take SCAN_SLICES * 4 steps to complete the scan
+    // it takes 5 ticks per slice plus some ticks for the led to blink
     // because we cycle through
     // ServoMovement -> Measure -> LedOn -> LedOff -> WaitNext
-    for (int i = 0; i < SCAN_SLICES * 5; i++) {
+    for (int i = 0; i < (SCAN_SLICES * 5) + (BLINK_DELAY_TICKS * SCAN_SLICES); i++) {
         sc.step();
     }
 
@@ -112,8 +112,8 @@ void test_should_blink_led_on_detect() {
     sc.step();
     // State should now be LedOff
 
-    // led should stay on for 40ms so it takes (40 / TICK_INTERVAL_MS) ticks
-    for (int i = 0; i < 40 / TICK_INTERVAL_MS; i++) {
+    // led should stay on for BLINK_DELAY_TICKS ticks
+    for (int i = 0; i < BLINK_DELAY_TICKS; i++) {
         sc.step();
     }
 
@@ -130,11 +130,10 @@ void test_should_not_blink_led_when_not_detecting() {
     sonar.reading = 0.3;
 
     // it takes 3 ticks to change states like
-    // ServoMovement -> Measure -> LedOn -> LedOff
-    // and BLINK_DELAY_TICKS to change LedOff -> WaitNext
+    // ServoMovement -> Measure -> WaitNext
     //
-    // We stop before going to WaitNext so currentSlice does not get updated
-    for (int i = 0; i < 3 + BLINK_DELAY_TICKS; i++) {
+    // We stop at 2 so currentSlice does not get updated
+    for (int i = 0; i < 2; i++) {
         sc.step();
     }
 
