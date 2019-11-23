@@ -179,7 +179,7 @@ void test_scan_should_take_specified_scantime() {
     // in the Scanner's WaitNext state
     unsigned int expectedTicks = (SCAN_SLICES * 3) + (scanTime / TICK_INTERVAL_MS / SCAN_SLICES) * SCAN_SLICES;
 
-    for (int i = 0; i < expectedTicks; i++) {
+    for (unsigned int i = 0; i < expectedTicks; i++) {
         sc.step();
     }
 
@@ -202,7 +202,7 @@ void test_detected_should_be_true_on_detect() {
 
     TEST_ASSERT_FALSE(sc.hasDetected());
 
-    for (int i = 0; i < ticks; i++) {
+    for (unsigned int i = 0; i < ticks; i++) {
         sc.step();
     }
 

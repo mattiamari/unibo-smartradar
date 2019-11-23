@@ -35,7 +35,7 @@ void Scheduler::remove(Task *task) {
 }
 
 void Scheduler::has(Task *task) {
-    
+
 }
 
 void Scheduler::clear() {
@@ -57,7 +57,7 @@ void Scheduler::schedule() {
         if (iter->task == nullptr) {
             continue;
         }
-        
+
         if (iter->task->isComplete()) {
             remove(iter->task);
             continue;
