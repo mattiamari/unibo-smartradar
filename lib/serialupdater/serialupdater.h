@@ -13,6 +13,7 @@ namespace smartradar
         SerialUpdater(Serial *serial, ScanStatus *scanStatus);
         void step();
         bool isComplete();
+        TaskType getType();
     private:
         Serial *serial;
         ScanStatus *scanStatus;

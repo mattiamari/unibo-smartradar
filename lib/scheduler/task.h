@@ -12,6 +12,12 @@
 
 namespace smartradar
 {
+    enum TaskType {
+        TASK_GENERIC = 1,
+        TASK_SCANNER,
+        TASK_SERIALUPDATER
+    };
+
     class Task
     {
     public:
@@ -19,6 +25,7 @@ namespace smartradar
         ~Task() {}
         virtual void step() = 0;
         virtual bool isComplete() = 0;
+        virtual TaskType getType() = 0;
     };
 }
 

@@ -34,8 +34,24 @@ void Scheduler::remove(Task *task) {
     }
 }
 
-void Scheduler::has(Task *task) {
+bool Scheduler::has(Task *task) {
+    for (int i = 0; i < MAX_TASKS; i++) {
+        if (tasks[i].task != nullptr && tasks[i].task == task) {
+            return true;
+        }
+    }
 
+    return false;
+}
+
+bool Scheduler::hasOfType(TaskType type) {
+    for (int i = 0; i < MAX_TASKS; i++) {
+        if (tasks[i].task != nullptr && tasks[i].task->getType() == type) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Scheduler::clear() {

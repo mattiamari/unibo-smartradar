@@ -13,3 +13,7 @@ void Blink::step() {
 bool Blink::isComplete() {
     return false;
 }
+
+TaskType Blink::getType() {
+    return TASK_GENERIC;
+}

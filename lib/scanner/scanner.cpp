@@ -60,6 +60,10 @@ bool Scanner::isComplete() {
     return scanComplete;
 }
 
+TaskType Scanner::getType() {
+    return TASK_SCANNER;
+}
+
 unsigned int Scanner::getNearestBoundIndex() {
     int min = servo->getAngleMin();
     int max = servo->getAngleMax();

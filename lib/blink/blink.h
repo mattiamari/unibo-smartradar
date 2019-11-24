@@ -11,11 +11,11 @@ namespace smartradar
     {
     public:
         Blink(Led *led);
-    private:
-        Led *led;
-
         void step();
         bool isComplete();
+        TaskType getType();
+    protected:
+        Led *led;
     };
 }
 

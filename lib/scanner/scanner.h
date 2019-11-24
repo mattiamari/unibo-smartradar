@@ -23,6 +23,7 @@ namespace smartradar
         void step();
         bool hasDetected();
         bool isComplete();
+        TaskType getType();
 
     protected:
         Servo *servo;

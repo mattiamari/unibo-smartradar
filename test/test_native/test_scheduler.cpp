@@ -23,6 +23,10 @@ public:
     bool isComplete() {
         return complete;
     }
+
+    TaskType getType() {
+        return TASK_GENERIC;
+    }
 };
 
 void test_dummy(void) {

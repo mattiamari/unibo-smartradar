@@ -57,3 +57,7 @@ void SerialUpdater::step() {
 bool SerialUpdater::isComplete() {
     return false;
 }
+
+TaskType SerialUpdater::getType() {
+    return TASK_SERIALUPDATER;
+}
