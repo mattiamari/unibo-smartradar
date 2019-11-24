@@ -8,12 +8,12 @@ namespace smartradar
 {
     class SonarImpl : public Sonar {
     private:
-        byte trigPin_;
-        byte echoPin_;
-        const double vs = 331.45 + 0.62*20;
+        short trigPin_;
+        short echoPin_;
+        const float vs = 331.45 + 0.62*20;
     
     public:
-        SonarImpl(byte trigPin, byte echoPin);
+        SonarImpl(short trigPin, short echoPin);
         float getReading();
         float getDistanceMin();
         float getDistanceMax();

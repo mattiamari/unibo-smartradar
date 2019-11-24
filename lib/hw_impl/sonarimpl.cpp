@@ -2,7 +2,7 @@
 
 using namespace smartradar;
 
-SonarImpl::SonarImpl(byte trigPin, byte echoPin) {
+SonarImpl::SonarImpl(short trigPin, short echoPin) {
     trigPin_ = trigPin;
     echoPin_ = echoPin;
     pinMode(trigPin_, OUTPUT);
@@ -19,10 +19,9 @@ float SonarImpl::getReading(){
     
     /* ricevi l’eco */
     long tUS = pulseInLong(echoPin_, HIGH);
-    Serial.println(tUS);
 
-    double t = tUS / 1000.0 / 1000.0 / 2;
-    double d = t*vs;
+    float t = tUS / 1000.0 / 1000.0 / 2;
+    float d = t*vs;
     return d;
 }
 
@@ -31,5 +30,5 @@ float SonarImpl::getDistanceMin() {
 }
 
 float SonarImpl::getDistanceMax() {
-    return 3.0;
+    return 1.0;
 }

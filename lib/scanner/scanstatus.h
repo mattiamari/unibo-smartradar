@@ -10,7 +10,7 @@ namespace smartradar
     typedef struct Measure_s {
         unsigned int sliceIdx;
         int angle;
-        double distance;
+        float distance;
     } Measure;
 
     class ScanStatus

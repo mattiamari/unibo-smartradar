@@ -2,7 +2,7 @@
 
 using namespace smartradar;
 
-ServoImpl::ServoImpl(byte pin) {
+ServoImpl::ServoImpl(short pin) {
     servo.attach(pin);
 }
 
@@ -10,7 +10,7 @@ int ServoImpl::getAngle() {
     return servo.read();
 }
 
-void ServoImpl::setAngle(int angle){
+void ServoImpl::setAngle(int angle) {
     servo.write(angle);
 }
 
@@ -19,5 +19,5 @@ int ServoImpl::getAngleMin() {
 }
 
 int ServoImpl::getAngleMax() {
-    return 170;
+    return 180;
 }

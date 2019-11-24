@@ -28,8 +28,8 @@ Measure* ScanStatus::getMeasures() {
 void ScanStatus::clearMeasures() {
     for (int i = 0; i < SCAN_SLICES; i++) {
         measures[i].sliceIdx = i;
-        measures[i].distance = 0.0;
         measures[i].angle = 0;
+        measures[i].distance = 0.0;
     }
 }
 

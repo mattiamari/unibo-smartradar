@@ -12,7 +12,7 @@ namespace smartradar {
         ::Servo servo;
 
     public:
-        ServoImpl(byte pin);
+        ServoImpl(short pin);
         void setAngle(int angle);
         int getAngle();
         int getAngleMin();
