@@ -2,6 +2,7 @@
 
 #include "scanner.h"
 #include "loopscanner.h"
+#include "alarmblink.h"
 
 using namespace smartradar;
 
@@ -16,7 +17,10 @@ Radar::Radar(Serial *serial, Sonar *sonar, Pir *pir, Servo *servo, Led *led1, Le
     currentMode = MODE_NONE;
     scheduler = Scheduler();
     scanStatus = ScanStatus();
-    serialUpdater = SerialUpdater(serial, &scanStatus);
+    serialUpdater = new SerialUpdater(serial, &this->scanStatus);
+
+    alarmBlink = new AlarmBlink(led2);
+    alarmBlink->setScanStatus(&scanStatus);
 }
 
 void Radar::setModeManual() {
@@ -24,8 +28,15 @@ void Radar::setModeManual() {
         return;
     }
     currentMode = MODE_MANUAL;
+    scanStatus.setCurrentMode(MODE_MANUAL);
 
-    scheduler.add(&serialUpdater, 500 / TICK_INTERVAL_MS);
+    scheduler.clear();
+    led1->turnOff();
+    led2->turnOff();
+    scanStatus.setAlarm(false);
+
+    scheduler.add(alarmBlink, 300 / TICK_INTERVAL_MS);
+    scheduler.add(serialUpdater, 500 / TICK_INTERVAL_MS);
 }
 
 void Radar::setModeSingle() {
@@ -33,8 +44,15 @@ void Radar::setModeSingle() {
         return;
     }
     currentMode = MODE_SINGLE;
+    scanStatus.setCurrentMode(MODE_SINGLE);
 
     scheduler.clear();
+    led1->turnOff();
+    led2->turnOff();
+    scanStatus.setAlarm(false);
+
+    scheduler.add(alarmBlink, 300 / TICK_INTERVAL_MS);
+    scheduler.add(serialUpdater, 1000 / TICK_INTERVAL_MS);
 }
 
 void Radar::setModeAuto() {
@@ -42,11 +60,20 @@ void Radar::setModeAuto() {
         return;
     }
     currentMode = MODE_AUTO;
+    scanStatus.setCurrentMode(MODE_AUTO);
 
-    LoopScanner loopScanner = LoopScanner(servo, sonar, led1);
+    scheduler.clear();
+    led1->turnOff();
+    led2->turnOff();
+    scanStatus.setAlarm(false);
 
-    scheduler.add(&loopScanner, 0);
-    scheduler.add(&serialUpdater, 500 / TICK_INTERVAL_MS);
+    LoopScanner *loopScanner = new LoopScanner(servo, sonar, led1);
+    loopScanner->setScanStatus(&scanStatus);
+    loopScanner->setScanTime(5000);
+
+    scheduler.add(loopScanner, 0);
+    scheduler.add(alarmBlink, 300 / TICK_INTERVAL_MS);
+    scheduler.add(serialUpdater, 500 / TICK_INTERVAL_MS);
 }
 
 void Radar::pirTriggered() {
@@ -54,8 +81,15 @@ void Radar::pirTriggered() {
         return;
     }
 
-    Scanner scanner = Scanner(servo, sonar, led1);
-    scheduler.add(&scanner, 0);
+    // Do not run a scan if one is already scheduled
+    if (scheduler.hasOfType(TASK_SCANNER)) {
+        return;
+    }
+
+    Scanner *scanner = new Scanner(servo, sonar, led1);
+    scanner->setScanStatus(&scanStatus);
+    scanner->setScanTime(6000);
+    scheduler.add(scanner, 0);
 }
 
 void Radar::tick() {

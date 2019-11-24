@@ -5,6 +5,7 @@
 #include "scanstatus.h"
 #include "scheduler.h"
 #include "serialupdater.h"
+#include "alarmblink.h"
 
 #include "sonar.h"
 #include "pir.h"
@@ -29,7 +30,8 @@ namespace smartradar
         RadarMode currentMode;
         ScanStatus scanStatus;
         Scheduler scheduler;
-        SerialUpdater serialUpdater;
+        SerialUpdater *serialUpdater;
+        AlarmBlink *alarmBlink;
 
         Sonar *sonar;
         Pir *pir;

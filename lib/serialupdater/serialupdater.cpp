@@ -3,6 +3,10 @@
 
 #include <string.h>
 
+#ifdef ARDUINO_UNO
+    #include <Arduino.h>
+#endif
+
 using namespace smartradar;
 
 SerialUpdater::SerialUpdater(Serial *serial, ScanStatus *scanStatus) {
@@ -26,8 +30,8 @@ void SerialUpdater::step() {
             "\"mode\":\"%s\","
             "\"alarm\":%d,"
             "\"slices\":%d,"
-            "\"scanDuration\":%d,"
-            "\"currentSlice\":%d,"
+            "\"scanDur\":%d,"
+            "\"currSlice\":%d,"
             "\"measures\":[",
         modeString,
         scanStatus->isAlarmActive(),
@@ -38,11 +42,14 @@ void SerialUpdater::step() {
     serial->print(buf);
 
     Measure *m = scanStatus->getMeasures();
+    char distanceString[8];
 
     for (int i = 0; i < SCAN_SLICES; i++) {
+        dtostrf(m[i].distance, 2, 4, distanceString);
         sprintf(buf,
-            "{\"i\":%d,\"a\":%d,\"d\":%.4f}",
-            m[i].sliceIdx, m[i].angle, m[i].distance);
+            "{\"i\":%d,\"a\":%d,\"d\":%s}",
+            m[i].sliceIdx, m[i].angle, distanceString
+        );
         serial->print(buf);
 
         // Print trailing comma except for last element
