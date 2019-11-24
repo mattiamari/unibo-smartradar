@@ -7,13 +7,13 @@ int smartradar::sliceToAngle(int slice, int slicesCount, int min, int max) {
     return ((float)slice / slicesCount * (max - min)) + min + ((max - min) / slicesCount / 2);
 }
 
-Scanner::Scanner(Servo *servo, Sonar *sonar, Led *led) {
+Scanner::Scanner(Servo *servo, Sonar *sonar, Potentiometer *potentiometer) {
     this->servo = servo;
     this->sonar = sonar;
-    this->led = led;
+    this->potentiometer = potentiometer;
     scanStatus = nullptr;
     scanTime = 0;
-    
+
     reset();
 }
 
@@ -45,10 +45,8 @@ void Scanner::step() {
 
     switch (currentState) {
         case STATE_SERVO_MOVEMENT: stateServoMovement(); break;
-        case STATE_MEASURE: stateMeasure(); break;
-        case STATE_LED_ON: stateLedOn(); break;
-        case STATE_LED_OFF: stateLedOff(); break;
-        case STATE_WAIT_NEXT: stateWaitNext();
+        case STATE_WAIT_BEFORE: stateWaitBefore(); break;
+        case STATE_MEASURE: stateMeasure();
     }
 }
 
@@ -77,9 +75,21 @@ void Scanner::stateServoMovement() {
         return;
     }
 
+    // Read potentiometer and update scan duration
+    scanTime = (potentiometer->getReading() / 1024.0 * (SCAN_DURATION_MAX - SCAN_DURATION_MIN)) + SCAN_DURATION_MIN;
+
     currentAngle = sliceToAngle(currentSlice, SCAN_SLICES, servo->getAngleMin(), servo->getAngleMax());
     servo->setAngle(currentAngle);
+
+    scanStatus->setScanDuration(scanTime);
     scanStatus->setCurrentSlice(currentSlice);
+    currentState = STATE_WAIT_BEFORE;
+}
+
+void Scanner::stateWaitBefore() {
+    static unsigned int elapsed = 0;
+    TASK_WAIT(elapsed, scanTime / TICK_INTERVAL_MS / SCAN_SLICES)
+
     currentState = STATE_MEASURE;
 }
 
@@ -89,32 +99,13 @@ void Scanner::stateMeasure() {
     scanStatus->getMeasures()[currentSlice].angle = currentAngle;
     scanStatus->getMeasures()[currentSlice].distance = distance;
 
+    scanStatus->setDetectedInCurrentSlice(false);
+
     if (distance >= sonar->getDistanceMin() && distance <= sonar->getDistanceMax()) {
         scanStatus->setAlarm(true);
+        scanStatus->setDetectedInCurrentSlice(true);
         detected = true;
-        currentState = STATE_LED_ON;
-        return;
     }
-
-    currentState = STATE_WAIT_NEXT;
-}
-
-void Scanner::stateLedOn() {
-    led->turnOn();
-    currentState = STATE_LED_OFF;
-}
-
-void Scanner::stateLedOff() {
-    static unsigned int elapsed = 0;
-    TASK_WAIT(elapsed, BLINK_DELAY_TICKS)
-
-    led->turnOff();
-    currentState = STATE_WAIT_NEXT;
-}
-
-void Scanner::stateWaitNext() {
-    static unsigned int elapsed = 0;
-    TASK_WAIT(elapsed, scanTime / TICK_INTERVAL_MS / SCAN_SLICES)
 
     currentState = STATE_SERVO_MOVEMENT;
     currentSlice += direction;

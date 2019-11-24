@@ -9,7 +9,7 @@ namespace smartradar
     class AlarmBlink : public Blink
     {
     public:
-        AlarmBlink(Led *led) : Blink(led) {};
+        AlarmBlink(Led *led);
         void step();
         void setScanStatus(ScanStatus *scanStatus);
     private:

@@ -85,19 +85,22 @@ void test_can_schedule_one_task(void) {
     TEST_ASSERT_EQUAL(0, task.steps);
 
     sched.schedule();
-    TEST_ASSERT_EQUAL(0, task.steps);
-
-    sched.schedule();
-    TEST_ASSERT_EQUAL(0, task.steps);
+    TEST_ASSERT_EQUAL(1, task.steps);
 
     sched.schedule();
     TEST_ASSERT_EQUAL(1, task.steps);
+
+    sched.schedule();
+    TEST_ASSERT_EQUAL(1, task.steps);
+
+    sched.schedule();
+    TEST_ASSERT_EQUAL(2, task.steps);
 
     for (int i = 0; i < 16; i++) {
         sched.schedule();
     }
 
-    TEST_ASSERT_EQUAL(6, task.steps);
+    TEST_ASSERT_EQUAL(7, task.steps);
 }
 
 void test_can_schedule_multiple_tasks(void) {
@@ -116,20 +119,20 @@ void test_can_schedule_multiple_tasks(void) {
         sched.schedule();
     }
 
-    TEST_ASSERT_EQUAL(12, task1.steps);
+    TEST_ASSERT_EQUAL(13, task1.steps);
     TEST_ASSERT_EQUAL(32, task2.steps);
-    TEST_ASSERT_EQUAL(5, task3.steps);
+    TEST_ASSERT_EQUAL(6, task3.steps);
     TEST_ASSERT_EQUAL(64, task4.steps);
 }
 
 void test_completed_tasks_are_removed(void) {
     Scheduler sched = Scheduler();
     DummyTask task1 = DummyTask();
-    
+
     sched.add((Task*)&task1, 1);
 
     TEST_ASSERT_EQUAL(1, sched.getTaskCount());
-    
+
     for (int i = 0; i < 2; i++) {
         sched.schedule();
     }

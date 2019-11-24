@@ -1,17 +1,18 @@
-#ifndef POTENTIOMETER_H
-#define POTENTIOMETER_H
+#ifndef SMARTRADAR_POTENTIOMETERIMPL_H
+#define SMARTRADAR_POTENTIOMETERIMPL_H
 
-#include "Arduino.h"
+#include "potentiometer.h"
+#include <Arduino.h>
 
 namespace smartradar {
-    class Potentiometer{
+    class PotentiometerImpl : public Potentiometer {
 
     private:
-        byte pin_;
-    
+        short pin_;
+
     public:
-        Potentiometer(byte pin);
-        int getReading(); 
+        PotentiometerImpl(short pin);
+        int getReading();
     };
 }
 

@@ -19,10 +19,12 @@ namespace smartradar
         ScanStatus();
         ~ScanStatus() {};
         bool isAlarmActive();
+        bool hasDetectedInCurrentSlice();
         void updateMeasure(Measure *measure);
         Measure *getMeasures();
         void clearMeasures();
         void setAlarm(bool state);
+        void setDetectedInCurrentSlice(bool state);
         int getCurrentSlice();
         void setCurrentSlice(int slice);
         int getScanDuration();
@@ -32,6 +34,7 @@ namespace smartradar
     private:
         Measure measures[SCAN_SLICES];
         bool alarm;
+        bool detectedInSlice;
         int currentSlice;
         int scanDuration;
         RadarMode currentMode;

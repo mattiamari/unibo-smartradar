@@ -2,6 +2,9 @@
 
 using namespace smartradar;
 
+LoopScanner::LoopScanner(Servo *servo, Sonar *sonar, Potentiometer *pot)
+    : Scanner(servo, sonar, pot) {};
+
 void LoopScanner::step() {
     if (scanComplete) {
         if (!detected) {

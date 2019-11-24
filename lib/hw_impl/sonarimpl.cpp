@@ -10,19 +10,15 @@ SonarImpl::SonarImpl(short trigPin, short echoPin) {
 }
 
 float SonarImpl::getReading(){
-    /* invio impulso */
     digitalWrite(trigPin_, LOW);
-    delayMicroseconds(3);
-    digitalWrite(trigPin_, HIGH);
     delayMicroseconds(5);
+    digitalWrite(trigPin_, HIGH);
+    delayMicroseconds(10);
     digitalWrite(trigPin_, LOW);
-    
-    /* ricevi l’eco */
-    long tUS = pulseInLong(echoPin_, HIGH);
 
-    float t = tUS / 1000.0 / 1000.0 / 2;
-    float d = t*vs;
-    return d;
+    long t = pulseIn(echoPin_, HIGH, 20000);
+
+    return t / 2 * 0.0343 / 100;
 }
 
 float SonarImpl::getDistanceMin() {

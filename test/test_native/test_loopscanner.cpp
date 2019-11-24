@@ -11,16 +11,17 @@ static DummyServo servo = DummyServo();
 static DummySonar sonar = DummySonar();
 static DummyLed led = DummyLed();
 static ScanStatus status = ScanStatus();
+static Scheduler scheduler = Scheduler();
 
 void test_should_create_loopscanner() {
-    LoopScanner sc = LoopScanner(&servo, &sonar, &led);
+    LoopScanner sc = LoopScanner(&servo, &sonar, &led, &scheduler);
 }
 
 void test_should_reset_alarm_when_no_detect() {
     servo.setAngle(0);
     status.setAlarm(false);
 
-    LoopScanner sc = LoopScanner(&servo, &sonar, &led);
+    LoopScanner sc = LoopScanner(&servo, &sonar, &led, &scheduler);
     sc.setScanStatus(&status);
     sc.setScanTime(0);
 
@@ -29,7 +30,7 @@ void test_should_reset_alarm_when_no_detect() {
     TEST_ASSERT_FALSE_MESSAGE(status.isAlarmActive(), "Alarm false before test");
 
     // ServoMovement -> Measure -> LedOn -> LedOff -> WaitNext
-    int requiredTicks = 
+    int requiredTicks =
         /* 4 ticks per slice */ (5 * SCAN_SLICES)
         /* led blink */ + (BLINK_DELAY_TICKS * SCAN_SLICES);
 

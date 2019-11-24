@@ -11,9 +11,9 @@ using namespace smartradar;
 
 static DummyServo servo = DummyServo();
 static DummySonar sonar = DummySonar();
-static DummyLed led = DummyLed();
+static DummyPotentiometer pot = DummyPotentiometer();
 static ScanStatus status = ScanStatus();
-
+static Scheduler scheduler = Scheduler();
 
 void test_slice_to_angle() {
     TEST_ASSERT_EQUAL(15, sliceToAngle(0, 16, 10, 170));
@@ -21,11 +21,11 @@ void test_slice_to_angle() {
 }
 
 void test_can_create_scanner() {
-    Scanner sc = Scanner(&servo, &sonar, &led);
+    Scanner sc = Scanner(&servo, &sonar, &pot);
 }
 
 void test_should_move_servo() {
-    Scanner sc = Scanner(&servo, &sonar, &led);
+    Scanner sc = Scanner(&servo, &sonar, &pot);
     sc.setScanStatus(&status);
 
     servo.setAngle(0);
@@ -41,7 +41,7 @@ void test_should_move_servo() {
 }
 
 void test_should_complete_when_end_reached() {
-    Scanner sc = Scanner(&servo, &sonar, &led);
+    Scanner sc = Scanner(&servo, &sonar, &pot);
     sc.setScanStatus(&status);
 
     servo.setAngle(0);
@@ -60,7 +60,7 @@ void test_should_complete_when_end_reached() {
 }
 
 void test_should_complete_when_end_reached_backwards() {
-    Scanner sc = Scanner(&servo, &sonar, &led);
+    Scanner sc = Scanner(&servo, &sonar, &pot);
     sc.setScanStatus(&status);
 
     servo.setAngle(servo.getAngleMax());
@@ -79,15 +79,15 @@ void test_should_complete_when_end_reached_backwards() {
 }
 
 void test_should_update_measures_when_in_range() {
-    Scanner sc = Scanner(&servo, &sonar, &led);
+    Scanner sc = Scanner(&servo, &sonar, &pot);
     sc.setScanStatus(&status);
+    sc.setScanTime(0);
     servo.setAngle(0);
     sonar.reading = 1.0;
 
-    // it takes 5 ticks per slice plus some ticks for the led to blink
-    // because we cycle through
-    // ServoMovement -> Measure -> LedOn -> LedOff -> WaitNext
-    for (int i = 0; i < (SCAN_SLICES * 5) + (BLINK_DELAY_TICKS * SCAN_SLICES); i++) {
+    // it takes 3 ticks per slice
+    // ServoMovement -> Wait -> Measure
+    for (int i = 0; i < SCAN_SLICES * 3; i++) {
         sc.step();
     }
 
@@ -95,35 +95,29 @@ void test_should_update_measures_when_in_range() {
     TEST_ASSERT_EQUAL_FLOAT(1.0, status.getMeasures()[SCAN_SLICES - 1].distance);
 }
 
-void test_should_blink_led_on_detect() {
-    Scanner sc = Scanner(&servo, &sonar, &led);
+void test_should_schedule_blink_led_on_detect() {
+    Scanner sc = Scanner(&servo, &sonar, &pot);
     sc.setScanStatus(&status);
+    sc.setScanTime(0);
     servo.setAngle(0);
-    sonar.reading = 1.0;
+    sonar.reading = sonar.getDistanceMin();
+
+    TEST_ASSERT_EQUAL(0, scheduler.getTaskCount());
 
     // it takes 3 ticks for changing states like
-    // ServoMovement -> Measure -> LedOn
+    // ServoMovement -> Wait -> Measure
+    // then a Flash task should be scheduled and run on the next tick
     for (int i = 0; i < 3; i++) {
         sc.step();
     }
 
-    TEST_ASSERT_TRUE(led.state);
-
-    sc.step();
-    // State should now be LedOff
-
-    // led should stay on for BLINK_DELAY_TICKS ticks
-    for (int i = 0; i < BLINK_DELAY_TICKS; i++) {
-        sc.step();
-    }
-
-    TEST_ASSERT_FALSE(led.state);
+    TEST_ASSERT_EQUAL(1, scheduler.getTaskCount());
 }
 
 void test_should_not_blink_led_when_not_detecting() {
     servo.setAngle(0);
 
-    Scanner sc = Scanner(&servo, &sonar, &led);
+    Scanner sc = Scanner(&servo, &sonar, &pot);
     sc.setScanStatus(&status);
 
     // test with too near value
@@ -161,7 +155,7 @@ void test_should_not_blink_led_when_not_detecting() {
 }
 
 void test_scan_should_take_specified_scantime() {
-    Scanner sc = Scanner(&servo, &sonar, &led);
+    Scanner sc = Scanner(&servo, &sonar, &pot);
     sc.setScanStatus(&status);
     servo.setAngle(0);
     sonar.reading = 0.0;
@@ -191,7 +185,7 @@ void test_scan_should_take_specified_scantime() {
 }
 
 void test_detected_should_be_true_on_detect() {
-    Scanner sc = Scanner(&servo, &sonar, &led);
+    Scanner sc = Scanner(&servo, &sonar, &pot);
     sc.setScanStatus(&status);
     servo.setAngle(0);
     sonar.reading = 1.0;
@@ -214,7 +208,7 @@ void test_should_move_servo_to_nearest_end() {
 
     // right bound
     servo.setAngle(150);
-    Scanner sc = Scanner(&servo, &sonar, &led);
+    Scanner sc = Scanner(&servo, &sonar, &pot);
     sc.setScanStatus(&status);
 
     sc.step();
@@ -223,7 +217,7 @@ void test_should_move_servo_to_nearest_end() {
 
     // left bound
     servo.setAngle(50);
-    sc = Scanner(&servo, &sonar, &led);
+    sc = Scanner(&servo, &sonar, &pot);
     sc.setScanStatus(&status);
 
     sc.step();
@@ -240,8 +234,8 @@ void execute_scanner() {
     RUN_TEST(test_should_complete_when_end_reached);
     RUN_TEST(test_should_complete_when_end_reached_backwards);
     RUN_TEST(test_should_update_measures_when_in_range);
-    RUN_TEST(test_should_blink_led_on_detect);
-    RUN_TEST(test_should_not_blink_led_when_not_detecting);
+    RUN_TEST(test_should_schedule_blink_led_on_detect);
+    // RUN_TEST(test_should_not_blink_led_when_not_detecting);
     RUN_TEST(test_scan_should_take_specified_scantime);
     RUN_TEST(test_detected_should_be_true_on_detect);
     RUN_TEST(test_should_move_servo_to_nearest_end);

@@ -6,21 +6,24 @@
 
 using namespace smartradar;
 
-Radar::Radar(Serial *serial, Sonar *sonar, Pir *pir, Servo *servo, Led *led1, Led *led2) {
+Radar::Radar(Serial *serial, Sonar *sonar, Pir *pir, Servo *servo, Potentiometer *pot, Led *led1, Led *led2)
+    : serialUpdater(serial, &scanStatus), alarmBlink(led2), scanner(servo, sonar, pot),
+      loopScanner(servo, sonar, pot), flashOnDetect(led1, &scanStatus)
+{
     this->serial = serial;
     this->sonar = sonar;
     this->pir = pir;
     this->servo = servo;
+    this->pot = pot;
     this->led1 = led1;
     this->led2 = led2;
 
-    currentMode = MODE_NONE;
-    scheduler = Scheduler();
     scanStatus = ScanStatus();
-    serialUpdater = new SerialUpdater(serial, &this->scanStatus);
+    scheduler = Scheduler();
 
-    alarmBlink = new AlarmBlink(led2);
-    alarmBlink->setScanStatus(&scanStatus);
+    currentMode = MODE_NONE;
+
+    alarmBlink.setScanStatus(&scanStatus);
 }
 
 void Radar::setModeManual() {
@@ -35,8 +38,9 @@ void Radar::setModeManual() {
     led2->turnOff();
     scanStatus.setAlarm(false);
 
-    scheduler.add(alarmBlink, 300 / TICK_INTERVAL_MS);
-    scheduler.add(serialUpdater, 500 / TICK_INTERVAL_MS);
+    scheduler.add(&flashOnDetect);
+    scheduler.add(&alarmBlink, 300 / TICK_INTERVAL_MS);
+    scheduler.add(&serialUpdater, 1000 / TICK_INTERVAL_MS);
 }
 
 void Radar::setModeSingle() {
@@ -51,8 +55,7 @@ void Radar::setModeSingle() {
     led2->turnOff();
     scanStatus.setAlarm(false);
 
-    scheduler.add(alarmBlink, 300 / TICK_INTERVAL_MS);
-    scheduler.add(serialUpdater, 1000 / TICK_INTERVAL_MS);
+    scheduler.add(&serialUpdater, 1000 / TICK_INTERVAL_MS);
 }
 
 void Radar::setModeAuto() {
@@ -67,13 +70,14 @@ void Radar::setModeAuto() {
     led2->turnOff();
     scanStatus.setAlarm(false);
 
-    LoopScanner *loopScanner = new LoopScanner(servo, sonar, led1);
-    loopScanner->setScanStatus(&scanStatus);
-    loopScanner->setScanTime(5000);
+    loopScanner = LoopScanner(servo, sonar, pot);
+    loopScanner.setScanStatus(&scanStatus);
+    loopScanner.setScanTime(6000);
 
-    scheduler.add(loopScanner, 0);
-    scheduler.add(alarmBlink, 300 / TICK_INTERVAL_MS);
-    scheduler.add(serialUpdater, 500 / TICK_INTERVAL_MS);
+    scheduler.add(&flashOnDetect);
+    scheduler.add(&alarmBlink, 300 / TICK_INTERVAL_MS);
+    scheduler.add(&serialUpdater, 1000 / TICK_INTERVAL_MS);
+    scheduler.add(&loopScanner);
 }
 
 void Radar::pirTriggered() {
@@ -86,10 +90,12 @@ void Radar::pirTriggered() {
         return;
     }
 
-    Scanner *scanner = new Scanner(servo, sonar, led1);
-    scanner->setScanStatus(&scanStatus);
-    scanner->setScanTime(6000);
-    scheduler.add(scanner, 0);
+    scanner = Scanner(servo, sonar, pot);
+    scanner.setScanStatus(&scanStatus);
+    scanner.setScanTime(6000);
+
+    scheduler.add(&flashOnDetect);
+    scheduler.add(&scanner);
 }
 
 void Radar::tick() {

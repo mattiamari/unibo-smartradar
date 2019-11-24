@@ -2,10 +2,11 @@
 
 using namespace smartradar;
 
-Potentiometer::Potentiometer(byte pin) {
+PotentiometerImpl::PotentiometerImpl(short pin) {
+    ::Serial.println(pin_);
     pin_ = pin;
 }
 
-int Potentiometer::getReading() {
-    return analogRead(pin_); 
+int PotentiometerImpl::getReading() {
+    return analogRead(pin_);
 }

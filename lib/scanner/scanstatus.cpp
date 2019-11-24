@@ -4,11 +4,16 @@ using namespace smartradar;
 
 ScanStatus::ScanStatus() {
     alarm = false;
+    detectedInSlice = false;
     clearMeasures();
 }
 
 bool ScanStatus::isAlarmActive() {
     return alarm;
+}
+
+bool ScanStatus::hasDetectedInCurrentSlice() {
+    return detectedInSlice;
 }
 
 void ScanStatus::updateMeasure(Measure *measure) {
@@ -35,6 +40,10 @@ void ScanStatus::clearMeasures() {
 
 void ScanStatus::setAlarm(bool state) {
     alarm = state;
+}
+
+void ScanStatus::setDetectedInCurrentSlice(bool state) {
+    detectedInSlice = state;
 }
 
 int ScanStatus::getCurrentSlice() {

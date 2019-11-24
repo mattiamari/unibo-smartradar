@@ -3,8 +3,8 @@
 
 #include "task.h"
 
-#define TICK_INTERVAL_MS 10
-#define MAX_TASKS 8
+#define TICK_INTERVAL_MS 60
+#define MAX_TASKS 16
 
 namespace smartradar
 {
@@ -20,6 +20,7 @@ namespace smartradar
         Scheduler();
         ~Scheduler() {};
         void add(Task *task, unsigned int interval);
+        void add(Task *task);
         void remove(Task *task);
         bool has(Task *task);
         bool hasOfType(TaskType type);

@@ -22,14 +22,14 @@ public:
 
     void println(const char *text) {
         print(text);
-        //print("\n");
+        print("\n");
     }
 };
 
 void test_should_write_json() {
-    DummySerial *serial = new DummySerial();
+    DummySerial serial = DummySerial();
     ScanStatus status = ScanStatus();
-    SerialUpdater updater = SerialUpdater(serial, &status);
+    SerialUpdater updater = SerialUpdater(&serial, &status);
 
     status.setCurrentMode(MODE_AUTO);
     status.setScanDuration(2000);
@@ -38,7 +38,7 @@ void test_should_write_json() {
     updater.step();
 
     // only compare the first 70 chars
-    int res = strncmp(serial->buf, "{\"mode\":\"auto\",\"alarm\":0,\"slices\":16,\"scanDuration\":2000,\"currentSlice\":0,\"measures\":[", 70);
+    int res = strncmp(serial.buf, "{\"m\":\"a\",\"a\":0,\"s\":16,\"sd\":2000,\"cs\":0,\"me\":[", 45);
 
     TEST_ASSERT_EQUAL(0, res);
 }

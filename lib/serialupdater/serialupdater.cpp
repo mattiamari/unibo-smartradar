@@ -9,30 +9,28 @@
 
 using namespace smartradar;
 
-SerialUpdater::SerialUpdater(Serial *serial, ScanStatus *scanStatus) {
-    this->serial = serial;
-    this->scanStatus = scanStatus;
-}
+SerialUpdater::SerialUpdater(Serial *serial, ScanStatus *scanStatus)
+    : serial(serial), scanStatus(scanStatus) {}
 
 void SerialUpdater::step() {
     char buf[256];
-    char modeString[8];
+    const char *modeString;
 
     switch (scanStatus->getCurrentMode()) {
-        case MODE_MANUAL: strcpy(modeString, "manual"); break;
-        case MODE_SINGLE: strcpy(modeString, "single"); break;
-        case MODE_AUTO: strcpy(modeString, "auto"); break;
-        default: strcpy(modeString, "none");
+        case MODE_MANUAL: modeString = "m"; break;
+        case MODE_SINGLE: modeString = "s"; break;
+        case MODE_AUTO: modeString = "a"; break;
+        default: modeString = "none";
     }
 
     sprintf(buf,
         "{"
-            "\"mode\":\"%s\","
-            "\"alarm\":%d,"
-            "\"slices\":%d,"
-            "\"scanDur\":%d,"
-            "\"currSlice\":%d,"
-            "\"measures\":[",
+            "\"m\":\"%s\","
+            "\"a\":%d,"
+            "\"s\":%d,"
+            "\"sd\":%d,"
+            "\"cs\":%d,"
+            "\"me\":[",
         modeString,
         scanStatus->isAlarmActive(),
         SCAN_SLICES,
@@ -45,11 +43,19 @@ void SerialUpdater::step() {
     char distanceString[8];
 
     for (int i = 0; i < SCAN_SLICES; i++) {
+        #ifdef ARDUINO_UNO
         dtostrf(m[i].distance, 2, 4, distanceString);
         sprintf(buf,
             "{\"i\":%d,\"a\":%d,\"d\":%s}",
             m[i].sliceIdx, m[i].angle, distanceString
         );
+        #else
+        sprintf(buf,
+            "{\"i\":%d,\"a\":%d,\"d\":%f}",
+            m[i].sliceIdx, m[i].angle, m[i].distance
+        );
+        #endif
+
         serial->print(buf);
 
         // Print trailing comma except for last element

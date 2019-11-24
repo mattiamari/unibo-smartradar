@@ -38,3 +38,12 @@ public:
     void turnOff();
     void toggle();
 };
+
+class DummyPotentiometer : public Potentiometer
+{
+public:
+    float reading;
+
+    DummyPotentiometer();
+    int getReading();
+};

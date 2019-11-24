@@ -8,7 +8,7 @@ namespace smartradar
     public:
         Potentiometer() {};
         ~Potentiometer() {};
-        virtual unsigned int getReading() = 0;
+        virtual int getReading() = 0;
     };
 }
 

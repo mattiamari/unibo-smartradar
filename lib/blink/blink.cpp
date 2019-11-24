@@ -2,9 +2,7 @@
 
 using namespace smartradar;
 
-Blink::Blink(Led *led) {
-    this->led = led;
-}
+Blink::Blink(Led *led) : led(led) {}
 
 void Blink::step() {
     led->toggle();

@@ -14,11 +14,15 @@ void Scheduler::add(Task *task, unsigned int interval) {
         if (iter->task == nullptr) {
             iter->task = task;
             iter->interval = interval;
-            iter->elapsed = 0;
+            iter->elapsed = interval;
             taskCount += 1;
             return;
         }
     }
+}
+
+void Scheduler::add(Task *task) {
+    add(task, 0);
 }
 
 void Scheduler::remove(Task *task) {
@@ -69,6 +73,8 @@ void Scheduler::schedule() {
     TaskInfo *iter = tasks;
     TaskInfo *endptr = tasks + MAX_TASKS;
 
+    unsigned long before, diff;
+
     for ( ; iter < endptr; iter++) {
         if (iter->task == nullptr) {
             continue;
@@ -84,8 +90,14 @@ void Scheduler::schedule() {
             continue;
         }
 
+        // before = millis();
         iter->task->step();
         iter->elapsed = 0;
+        // diff = millis() - before;
+        // ::Serial.print("task ");
+        // ::Serial.print((int)iter->task);
+        // ::Serial.print(": ");
+        // ::Serial.println(diff);
     }
 }
 
