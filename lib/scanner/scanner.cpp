@@ -9,12 +9,10 @@ int smartradar::sliceToAngle(int slice, int slicesCount, int min, int max) {
     return ((float)slice / slicesCount * (max - min)) + min + ((max - min) / slicesCount / 2);
 }
 
-Scanner::Scanner(Servo *servo, Sonar *sonar, Potentiometer *potentiometer) {
+Scanner::Scanner(Servo *servo, Sonar *sonar) {
     this->servo = servo;
     this->sonar = sonar;
-    this->potentiometer = potentiometer;
     scanStatus = nullptr;
-    lastPotReading = 0;
 
     reset();
 }
@@ -73,13 +71,6 @@ void Scanner::stateServoMovement() {
         return;
     }
 
-    // Read potentiometer and update scan duration
-    int potReading = potentiometer->getReading();
-    if (abs(potReading - lastPotReading) > POT_CHANGE_THRESH) {
-        scanStatus->setScanDuration((potReading / 1024.0 * (SCAN_DURATION_MAX - SCAN_DURATION_MIN)) + SCAN_DURATION_MIN);
-        lastPotReading = potReading;
-    }
-
     currentAngle = sliceToAngle(currentSlice, SCAN_SLICES, servo->getAngleMin(), servo->getAngleMax());
     servo->setAngle(currentAngle);
 
@@ -89,7 +80,8 @@ void Scanner::stateServoMovement() {
 
 void Scanner::stateWaitBefore() {
     static unsigned int elapsed = 0;
-    TASK_WAIT(elapsed, scanStatus->getScanDuration() / TICK_INTERVAL_MS / SCAN_SLICES)
+    // The "-3" is there to account for the ticks taken by the state machine itself
+    TASK_WAIT(elapsed, (scanStatus->getScanDuration() / TICK_INTERVAL_MS / SCAN_SLICES) - 3)
 
     currentState = STATE_MEASURE;
 }

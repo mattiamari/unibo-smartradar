@@ -8,7 +8,7 @@ namespace smartradar
     class LoopScanner : public Scanner
     {
     public:
-        LoopScanner(Servo *servo, Sonar *sonar, Potentiometer *pot);
+        LoopScanner(Servo *servo, Sonar *sonar);
         void step();
         bool isComplete();
     };

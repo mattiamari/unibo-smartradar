@@ -2,16 +2,14 @@
 #define SMARTRADAR_SCANNER_H
 
 #include "task.h"
-#include "servo.h"
+#include "servointerface.h"
 #include "sonar.h"
-#include "potentiometer.h"
 #include "scanstatus.h"
 
 #define BLINK_DELAY_TICKS 50 / TICK_INTERVAL_MS
 
-#define SCAN_DURATION_MIN 2000
+#define SCAN_DURATION_MIN 3000
 #define SCAN_DURATION_MAX 10000
-#define POT_CHANGE_THRESH 50
 
 namespace smartradar
 {
@@ -20,7 +18,7 @@ namespace smartradar
     class Scanner : public Task
     {
     public:
-        Scanner(Servo *servo, Sonar *sonar, Potentiometer *potentiometer);
+        Scanner(Servo *servo, Sonar *sonar);
         void setScanStatus(ScanStatus *status);
         void step();
         bool hasDetected();
@@ -30,7 +28,6 @@ namespace smartradar
     protected:
         Servo *servo;
         Sonar *sonar;
-        Potentiometer *potentiometer;
         ScanStatus *scanStatus;
 
         int currentSlice;
@@ -39,7 +36,6 @@ namespace smartradar
         short direction;
         bool scanComplete;
         bool detected;
-        unsigned int lastPotReading;
 
         void reset();
         void stateServoMovement();

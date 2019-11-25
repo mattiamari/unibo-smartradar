@@ -7,8 +7,8 @@
 using namespace smartradar;
 
 Radar::Radar(Serial *serial, Sonar *sonar, Pir *pir, Servo *servo, Potentiometer *pot, Led *led1, Led *led2)
-    : serialUpdater(serial, &scanStatus), alarmBlink(led2), scanner(servo, sonar, pot),
-      loopScanner(servo, sonar, pot), flashOnDetect(led1, &scanStatus)
+    : serialUpdater(serial, &scanStatus), alarmBlink(led2), scanner(servo, sonar),
+      loopScanner(servo, sonar), flashOnDetect(led1, &scanStatus), potReader(pot, &scanStatus)
 {
     this->serial = serial;
     this->sonar = sonar;
@@ -39,7 +39,7 @@ void Radar::setModeManual() {
     scanStatus.setAlarm(false);
 
     scheduler.add(&flashOnDetect);
-    scheduler.add(&alarmBlink, 300 / TICK_INTERVAL_MS);
+    scheduler.add(&potReader, 500 / TICK_INTERVAL_MS);
     scheduler.add(&serialUpdater, 1000 / TICK_INTERVAL_MS);
 }
 
@@ -56,6 +56,7 @@ void Radar::setModeSingle() {
     scanStatus.setAlarm(false);
 
     scheduler.add(&flashOnDetect);
+    scheduler.add(&potReader, 500 / TICK_INTERVAL_MS);
     scheduler.add(&serialUpdater, 1000 / TICK_INTERVAL_MS);
 }
 
@@ -71,13 +72,14 @@ void Radar::setModeAuto() {
     led2->turnOff();
     scanStatus.setAlarm(false);
 
-    loopScanner = LoopScanner(servo, sonar, pot);
+    loopScanner = LoopScanner(servo, sonar);
     loopScanner.setScanStatus(&scanStatus);
 
     scheduler.add(&flashOnDetect);
     scheduler.add(&alarmBlink, 300 / TICK_INTERVAL_MS);
-    scheduler.add(&serialUpdater, 1000 / TICK_INTERVAL_MS);
     scheduler.add(&loopScanner);
+    scheduler.add(&potReader, 500 / TICK_INTERVAL_MS);
+    scheduler.add(&serialUpdater, 1000 / TICK_INTERVAL_MS);
 }
 
 void Radar::servoLeft() {
@@ -118,7 +120,7 @@ void Radar::pirTriggered() {
         return;
     }
 
-    scanner = Scanner(servo, sonar, pot);
+    scanner = Scanner(servo, sonar);
     scanner.setScanStatus(&scanStatus);
 
     scheduler.add(&scanner);

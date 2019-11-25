@@ -9,10 +9,11 @@
 #include "scanner.h"
 #include "loopscanner.h"
 #include "flash.h"
+#include "potreader.h"
 
 #include "sonar.h"
 #include "pir.h"
-#include "servo.h"
+#include "servointerface.h"
 #include "potentiometer.h"
 #include "led.h"
 #include "serial.h"
@@ -42,6 +43,7 @@ namespace smartradar
         Scanner scanner;
         LoopScanner loopScanner;
         Flash flashOnDetect;
+        PotReader potReader;
 
         Sonar *sonar;
         Pir *pir;
