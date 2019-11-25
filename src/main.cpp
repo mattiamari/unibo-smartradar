@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <EnableInterrupt.h>
-#include <TimerOne.h>
 
 #include <radar.h>
 
