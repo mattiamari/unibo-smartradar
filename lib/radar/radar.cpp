@@ -55,6 +55,7 @@ void Radar::setModeSingle() {
     led2->turnOff();
     scanStatus.setAlarm(false);
 
+    scheduler.add(&flashOnDetect);
     scheduler.add(&serialUpdater, 1000 / TICK_INTERVAL_MS);
 }
 
@@ -72,12 +73,39 @@ void Radar::setModeAuto() {
 
     loopScanner = LoopScanner(servo, sonar, pot);
     loopScanner.setScanStatus(&scanStatus);
-    loopScanner.setScanTime(6000);
 
     scheduler.add(&flashOnDetect);
     scheduler.add(&alarmBlink, 300 / TICK_INTERVAL_MS);
     scheduler.add(&serialUpdater, 1000 / TICK_INTERVAL_MS);
     scheduler.add(&loopScanner);
+}
+
+void Radar::servoLeft() {
+    servoStep(-1);
+}
+
+void Radar::servoRight() {
+    servoStep(1);
+}
+
+void Radar::servoStep(short direction) {
+    if (scanStatus.getCurrentMode() != MODE_MANUAL) {
+        return;
+    }
+
+    int currSlice = scanStatus.getCurrentSlice();
+    currSlice += direction;
+
+    if (currSlice >= SCAN_SLICES - 1 || currSlice <= 0) {
+        return;
+    }
+
+    servo->setAngle(sliceToAngle(currSlice, SCAN_SLICES, servo->getAngleMin(), servo->getAngleMax()));
+    scanStatus.setCurrentSlice(currSlice);
+}
+
+void Radar::setScanDuration(int duration) {
+    scanStatus.setScanDuration(duration);
 }
 
 void Radar::pirTriggered() {
@@ -92,9 +120,7 @@ void Radar::pirTriggered() {
 
     scanner = Scanner(servo, sonar, pot);
     scanner.setScanStatus(&scanStatus);
-    scanner.setScanTime(6000);
 
-    scheduler.add(&flashOnDetect);
     scheduler.add(&scanner);
 }
 

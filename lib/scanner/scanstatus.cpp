@@ -5,6 +5,8 @@ using namespace smartradar;
 ScanStatus::ScanStatus() {
     alarm = false;
     detectedInSlice = false;
+    currentSlice = 0;
+    scanDuration = 0;
     clearMeasures();
 }
 

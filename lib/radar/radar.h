@@ -26,6 +26,9 @@ namespace smartradar
         void setModeManual();
         void setModeSingle();
         void setModeAuto();
+        void servoLeft();
+        void servoRight();
+        void setScanDuration(int duration);
         void pirTriggered();
         void tick();
         RadarMode getCurrentMode();
@@ -48,6 +51,8 @@ namespace smartradar
         Led *led2;
 
         Serial *serial;
+
+        void servoStep(short direction);
     };
 }
 

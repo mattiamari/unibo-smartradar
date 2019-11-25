@@ -3,8 +3,8 @@
 
 #include "task.h"
 
-#define TICK_INTERVAL_MS 60
-#define MAX_TASKS 16
+#define TICK_INTERVAL_MS 50
+#define MAX_TASKS 8
 
 namespace smartradar
 {

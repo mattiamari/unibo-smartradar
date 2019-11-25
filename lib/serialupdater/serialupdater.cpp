@@ -13,7 +13,7 @@ SerialUpdater::SerialUpdater(Serial *serial, ScanStatus *scanStatus)
     : serial(serial), scanStatus(scanStatus) {}
 
 void SerialUpdater::step() {
-    char buf[256];
+    char buf[128];
     const char *modeString;
 
     switch (scanStatus->getCurrentMode()) {

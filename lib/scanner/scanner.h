@@ -11,6 +11,7 @@
 
 #define SCAN_DURATION_MIN 2000
 #define SCAN_DURATION_MAX 10000
+#define POT_CHANGE_THRESH 50
 
 namespace smartradar
 {
@@ -21,7 +22,6 @@ namespace smartradar
     public:
         Scanner(Servo *servo, Sonar *sonar, Potentiometer *potentiometer);
         void setScanStatus(ScanStatus *status);
-        void setScanTime(unsigned int milliseconds);
         void step();
         bool hasDetected();
         bool isComplete();
@@ -33,13 +33,13 @@ namespace smartradar
         Potentiometer *potentiometer;
         ScanStatus *scanStatus;
 
-        unsigned int scanTime;
         int currentSlice;
         int currentAngle;
         short currentState;
         short direction;
         bool scanComplete;
         bool detected;
+        unsigned int lastPotReading;
 
         void reset();
         void stateServoMovement();

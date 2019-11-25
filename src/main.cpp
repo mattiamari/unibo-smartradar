@@ -36,6 +36,16 @@ smartradar::Radar *radar;
 unsigned long time = 0;
 unsigned long diff;
 
+enum SerialCommands {
+    CMD_SWITCH_MANUAL = 97, // a 0x61
+    CMD_SWITCH_SINGLE,      // b 0x62
+    CMD_SWITCH_AUTO,        // c 0x63
+    CMD_SERVO_LEFT,         // d 0x64
+    CMD_SERVO_RIGHT,        // e 0x65
+    CMD_SPEED               // f 0x66
+};
+// terminating character is z 0x7A
+
 void onBtn1Press() {
     radar->setModeManual();
 }
@@ -56,6 +66,27 @@ void onTick() {
     radar->tick();
 }
 
+void serialEvent() {
+    char buf[3];
+    char tmp;
+    int16_t *duration = (int16_t *)&(buf[1]);
+
+    Serial.readBytesUntil('z', buf, 3);
+
+    switch (buf[0]) {
+        case CMD_SWITCH_AUTO: radar->setModeAuto(); break;
+        case CMD_SWITCH_SINGLE: radar->setModeSingle(); break;
+        case CMD_SWITCH_MANUAL: radar->setModeManual(); break;
+        case CMD_SERVO_LEFT: radar->servoLeft(); break;
+        case CMD_SERVO_RIGHT: radar->servoRight(); break;
+        case CMD_SPEED:
+            tmp = buf[1];
+            buf[1] = buf[2];
+            buf[2] = tmp;
+            radar->setScanDuration(*duration);
+    }
+}
+
 void setup()
 {
     Serial.begin(SERIAL_BAUD);
@@ -73,6 +104,14 @@ void setup()
     enableInterrupt(PIN_BTN_2, onBtn2Press, RISING);
     enableInterrupt(PIN_BTN_3, onBtn3Press, RISING);
     enableInterrupt(PIN_PIR, onPirTrigger, RISING);
+
+    led1->turnOn();
+    led2->turnOn();
+    servo->setAngle(servo->getAngleMax());
+    delay(800);
+    servo->setAngle(servo->getAngleMin());
+    led1->turnOff();
+    led2->turnOff();
 
     Serial.println("Setup end");
 

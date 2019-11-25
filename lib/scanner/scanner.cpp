@@ -1,6 +1,8 @@
 #include "scanner.h"
 #include "scheduler.h"
 
+#include <stdlib.h>
+
 using namespace smartradar;
 
 int smartradar::sliceToAngle(int slice, int slicesCount, int min, int max) {
@@ -12,7 +14,7 @@ Scanner::Scanner(Servo *servo, Sonar *sonar, Potentiometer *potentiometer) {
     this->sonar = sonar;
     this->potentiometer = potentiometer;
     scanStatus = nullptr;
-    scanTime = 0;
+    lastPotReading = 0;
 
     reset();
 }
@@ -32,10 +34,6 @@ void Scanner::reset() {
 
 void Scanner::setScanStatus(ScanStatus *status) {
     scanStatus = status;
-}
-
-void Scanner::setScanTime(unsigned int milliseconds) {
-    scanTime = milliseconds;
 }
 
 void Scanner::step() {
@@ -76,19 +74,22 @@ void Scanner::stateServoMovement() {
     }
 
     // Read potentiometer and update scan duration
-    scanTime = (potentiometer->getReading() / 1024.0 * (SCAN_DURATION_MAX - SCAN_DURATION_MIN)) + SCAN_DURATION_MIN;
+    int potReading = potentiometer->getReading();
+    if (abs(potReading - lastPotReading) > POT_CHANGE_THRESH) {
+        scanStatus->setScanDuration((potReading / 1024.0 * (SCAN_DURATION_MAX - SCAN_DURATION_MIN)) + SCAN_DURATION_MIN);
+        lastPotReading = potReading;
+    }
 
     currentAngle = sliceToAngle(currentSlice, SCAN_SLICES, servo->getAngleMin(), servo->getAngleMax());
     servo->setAngle(currentAngle);
 
-    scanStatus->setScanDuration(scanTime);
     scanStatus->setCurrentSlice(currentSlice);
     currentState = STATE_WAIT_BEFORE;
 }
 
 void Scanner::stateWaitBefore() {
     static unsigned int elapsed = 0;
-    TASK_WAIT(elapsed, scanTime / TICK_INTERVAL_MS / SCAN_SLICES)
+    TASK_WAIT(elapsed, scanStatus->getScanDuration() / TICK_INTERVAL_MS / SCAN_SLICES)
 
     currentState = STATE_MEASURE;
 }
