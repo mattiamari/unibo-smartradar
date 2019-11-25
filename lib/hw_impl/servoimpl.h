@@ -1,7 +1,7 @@
 #ifndef SMARTRADAR_SERVOIMPL_H
 #define SMARTRADAR_SERVOIMPL_H
 
-#include "servo.h"
+#include "servointerface.h"
 
 #include <Arduino.h>
 #include <Servo.h>

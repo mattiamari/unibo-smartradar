@@ -1,5 +1,5 @@
 #include "sonar.h"
-#include "servo.h"
+#include "servointerface.h"
 #include "led.h"
 
 using namespace smartradar;
