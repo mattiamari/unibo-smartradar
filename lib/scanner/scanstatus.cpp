@@ -56,11 +56,11 @@ void ScanStatus::setCurrentSlice(int slice) {
     currentSlice = slice;
 }
 
-int ScanStatus::getScanDuration() {
+unsigned int ScanStatus::getScanDuration() {
     return scanDuration;
 }
 
-void ScanStatus::setScanDuration(int duration) {
+void ScanStatus::setScanDuration(unsigned int duration) {
     scanDuration = duration;
 }
 

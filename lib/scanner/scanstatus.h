@@ -27,8 +27,8 @@ namespace smartradar
         void setDetectedInCurrentSlice(bool state);
         int getCurrentSlice();
         void setCurrentSlice(int slice);
-        int getScanDuration();
-        void setScanDuration(int duration);
+        unsigned int getScanDuration();
+        void setScanDuration(unsigned int duration);
         RadarMode getCurrentMode();
         void setCurrentMode(RadarMode mode);
     private:
@@ -36,7 +36,7 @@ namespace smartradar
         bool alarm;
         bool detectedInSlice;
         int currentSlice;
-        int scanDuration;
+        unsigned int scanDuration;
         RadarMode currentMode;
     };
 }
